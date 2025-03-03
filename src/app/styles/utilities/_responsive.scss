@@ -1,0 +1,5 @@
+@use '../core/mixins' as mix;
+
+.responsive-container {
+  @include mix.container-responsive;
+}

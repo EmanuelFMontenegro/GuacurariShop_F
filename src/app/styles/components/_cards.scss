@@ -1,0 +1,26 @@
+.dashboard-card {
+    @apply relative flex flex-col bg-clip-border rounded-xl bg-white dark:bg-gray-800 shadow-md transition-all;
+    
+    &-header {
+      @apply bg-clip-border mx-4 rounded-xl overflow-hidden absolute -mt-4 grid h-16 w-16 place-items-center shadow-lg;
+      
+      &.blue { @apply bg-gradient-to-tr from-blue-600 to-blue-400; }
+      &.red { @apply bg-gradient-to-tr from-red-600 to-red-400; }
+    }
+    
+    &-content {
+      @apply p-4 text-right;
+      
+      h4 {
+        @apply text-2xl font-semibold text-gray-800 dark:text-gray-100;
+      }
+      
+      p {
+        @apply text-sm text-gray-600 dark:text-gray-400;
+      }
+    }
+    
+    &-footer {
+      @apply border-t border-gray-200 dark:border-gray-700 p-4;
+    }
+  }

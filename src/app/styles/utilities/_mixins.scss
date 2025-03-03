@@ -1,0 +1,17 @@
+@mixin chart-container {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    @apply shadow-xl;
+  }
+}
+
+@mixin container-responsive {
+  @apply w-full mx-auto px-4;
+  
+  @screen sm { max-width: theme('screens.sm'); }
+  @screen md { max-width: theme('screens.md'); }
+  @screen lg { max-width: theme('screens.lg'); }
+  @screen xl { max-width: theme('screens.xl'); }
+}

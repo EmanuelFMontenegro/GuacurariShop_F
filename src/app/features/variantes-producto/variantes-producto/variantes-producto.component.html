@@ -1,0 +1,33 @@
+<div class="p-6 bg-white rounded-2xl shadow-md">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Variantes del Producto</h2>
+  
+    <div *ngIf="variantes$ | async as variantes; else cargando">
+      <div *ngIf="variantes.length > 0; else sinDatos">
+        <table class="w-full border-collapse border border-gray-200">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="border border-gray-300 px-4 py-2">Nombre</th>
+              <th class="border border-gray-300 px-4 py-2">Precio</th>
+              <th class="border border-gray-300 px-4 py-2">Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let variante of variantes" class="hover:bg-gray-50">
+              <td class="border border-gray-300 px-4 py-2">{{ variante.nombre }}</td>
+              <td class="border border-gray-300 px-4 py-2">${{ variante.precio }}</td>
+              <td class="border border-gray-300 px-4 py-2">{{ variante.stock }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <ng-template #cargando>
+      <p class="text-gray-600">Cargando variantes...</p>
+    </ng-template>
+  
+    <ng-template #sinDatos>
+      <p class="text-gray-600">No hay variantes disponibles.</p>
+    </ng-template>
+  </div>
+  

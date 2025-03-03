@@ -1,0 +1,17 @@
+
+@mixin dark-theme {
+    .dashboard-card {
+      @apply bg-gray-800;
+      
+      &-content {
+        h4 { @apply text-gray-100; }
+        p { @apply text-gray-400; }
+      }
+    }
+    
+    .chart-container {
+      @apply bg-gray-800;
+    }
+  }
+  
+  .dark { @include dark-theme; }

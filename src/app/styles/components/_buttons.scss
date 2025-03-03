@@ -1,0 +1,20 @@
+.btn {
+    @apply inline-flex items-center justify-center rounded-lg px-6 py-3 font-medium transition-all;
+    
+    &-primary {
+      @apply bg-blue-600 text-white hover:bg-blue-700;
+    }
+    
+    &-icon {
+      @apply p-3 rounded-full;
+      svg {
+        @apply w-5 h-5;
+      }
+    }
+    
+    &-gradient {
+      @apply text-white bg-gradient-to-r;
+      &.blue { @apply from-blue-600 to-blue-400; }
+      &.red { @apply from-red-600 to-red-400; }
+    }
+  }

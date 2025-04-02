@@ -58,7 +58,9 @@
             />
           </td>
           <td class="px-4 py-2 text-right">${{ item.precio | number: '1.2-2' }}</td>
-          <td class="px-4 py-2 text-right">${{ item.precio * item.cantidad | number: '1.2-2' }}</td>
+          <td class="px-4 py-2 text-right">producto.cantidad!.toString();
+
+          </td>
           <td class="px-4 py-2 text-center">
             <button (click)="removeItem(item)" class="text-red-600 font-semibold hover:underline">Eliminar</button>
           </td>
@@ -74,7 +76,7 @@
     </div>
     <button
       class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-200"
-      (click)="completeSale()">
+      (click)="realizarVenta()">
       Completar Venta
     </button>
   </div>

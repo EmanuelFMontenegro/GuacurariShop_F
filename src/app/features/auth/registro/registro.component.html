@@ -1,93 +1,90 @@
 <div class="min-h-screen bg-gradient-to-br from-[#1D76D2] to-[#F5F7FB] flex items-center justify-center p-4">
-    <div class="bg-white/50 backdrop-blur-lg rounded-xl shadow-lg p-6 w-full max-w-md"> <!-- Cambié p-8 a p-6 -->
-      <div class="text-center relative">
-        <img class="mx-auto max-h-28 w-auto scale-110 mb-[-8px] pb-2" src="/guacurari_tech.png" alt="GuacurariShop"> <!-- Cambié max-h-36 a max-h-32 y el padding de abajo a pb-2 -->
-        <h2 class="text-xl font-bold text-transparent bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] bg-clip-text pb-2"> <!-- Cambié text-2xl a text-xl y el padding a pb-2 -->
-          Regístrate en GuacuShop
-        </h2>
-      </div>
-  
-      <form class="space-y-5 mt-5" (ngSubmit)="registerCliente()"> <!-- Cambié mt-6 a mt-5 y space-y-6 a space-y-5 -->
-        <!-- Email -->
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-900">Correo electrónico</label>
-          <div class="mt-2 flex items-center">
-            <span class="material-symbols-outlined mr-2 bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] text-transparent bg-clip-text">
-              person
-            </span>
-            <input type="email" id="email" [(ngModel)]="email" name="email" autocomplete="email" required
-                   class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300
-                          focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm">
-          </div>
-        </div>
-  
-        <!-- Teléfono -->
-        <div>
-          <label for="telefono" class="block text-sm font-medium text-gray-900">Teléfono</label>
-          <div class="mt-2 flex items-center">
-            <span class="material-symbols-outlined mr-2 bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] text-transparent bg-clip-text">
-              call
-            </span>
-            <input type="text" id="telefono" [(ngModel)]="telefono" name="telefono" required
-                   class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300
-                          focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm">
-          </div>
-        </div>
-  
-        <!-- Contraseña -->
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-900">Contraseña</label>
-          <div class="mt-2 flex items-center relative">
-            <span class="material-symbols-outlined mr-2 bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] text-transparent bg-clip-text">
-              passkey
-            </span>
-            <input [type]="passwordVisible ? 'text' : 'password'" id="password" [(ngModel)]="password" name="password"
-                   autocomplete="new-password" required
-                   class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300
-                          focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm pr-10">
-            <span (click)="togglePasswordVisibility()" class="material-symbols-outlined cursor-pointer absolute right-2 text-[#9B59B6]">
-              {{ passwordVisible ? 'visibility_off' : 'visibility' }}
-            </span>
-          </div>
-        </div>
-  
-        <!-- Rubro -->
-        <div>
-          <label for="rubro" class="block text-sm font-medium text-gray-900">Selecciona un rubro</label>
-          <div class="mt-2 flex items-center">
-            <span class="material-symbols-outlined mr-2 bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] text-transparent bg-clip-text">
-              category
-            </span>
-            <select id="rubro" [(ngModel)]="rubro" name="rubro" required
-                    class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300
-                           focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm">
-              <option value="Kiosko">Kiosko</option>
-              <option value="Comida Saludable">Comida Saludable</option>
-              <option value="Herboristería">Herboristería</option>
-              <option value="Bar">Bar</option>
-              <option value="Pizzería">Pizzería</option>
-            </select>
-          </div>
-        </div>
-  
-        <!-- Submit Button -->
-        <div>
-          <button type="submit"
-                  class="w-full flex justify-center items-center rounded-md bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2]
-                         shadow-md text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40
-                         active:opacity-[0.85] px-4 py-3 h-11">
-            <span *ngIf="!isLoading">Registrarse</span>
-            <div *ngIf="isLoading" class="animate-spin w-5 h-5 border-4 border-t-transparent border-white rounded-full"></div>
-          </button>
-        </div>
-      </form>
-  
-      <!-- Mensaje de login -->
-      <p class="mt-8 text-center text-sm text-gray-500">
-        ¿Ya estás registrado? 
-        <a [routerLink]="['/auth/login']" class="font-semibold text-indigo-600 hover:text-indigo-500">Inicia sesión</a>
-      </p>
-      
+  <div class="bg-white/50 backdrop-blur-lg rounded-xl shadow-lg p-6 w-full max-w-md">
+    <div class="text-center relative">
+      <img class="mx-auto max-h-28 w-auto scale-110 mb-[-8px] pb-2" src="/guacurari_tech.png" alt="GuacurariShop">
+      <h2 class="text-xl font-bold text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text pb-2">
+        Regístrate en GuacuShop
+      </h2>
     </div>
+
+    <form class="space-y-5 mt-5" (ngSubmit)="registerCliente()">
+      <div>
+        <label for="email" class="block text-sm font-medium text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+          Correo electrónico
+        </label>
+        <div class="mt-2 flex items-center">
+          <span class="material-symbols-outlined mr-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+            person
+          </span>
+          <input type="email" id="email" [(ngModel)]="email" name="email" autocomplete="email" required
+                 class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm">
+        </div>
+      </div>
+
+      <div>
+        <label for="telefono" class="block text-sm font-medium text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+          Teléfono
+        </label>
+        <div class="mt-2 flex items-center">
+          <span class="material-symbols-outlined mr-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+            call
+          </span>
+          <input type="text" id="telefono" [(ngModel)]="telefono" name="telefono" required
+                 class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm">
+        </div>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+          Contraseña
+        </label>
+        <div class="mt-2 flex items-center relative">
+          <span class="material-symbols-outlined mr-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+            passkey
+          </span>
+          <input [type]="passwordVisible ? 'text' : 'password'" id="password" [(ngModel)]="password" name="password"
+                 autocomplete="new-password" required
+                 class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm pr-10">
+          <span (click)="togglePasswordVisibility()"
+                class="material-symbols-outlined cursor-pointer absolute right-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+            {{ passwordVisible ? 'visibility_off' : 'visibility' }}
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <label for="rubro" class="block text-sm font-medium text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+          Selecciona un rubro
+        </label>
+        <div class="mt-2 flex items-center">
+          <span class="material-symbols-outlined mr-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+            category
+          </span>
+          <select id="rubro" [(ngModel)]="rubro" name="rubro" required
+                  class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm">
+            <option value="Kiosko">Kiosko</option>
+            <option value="Comida Saludable">Comida Saludable</option>
+            <option value="Herboristería">Herboristería</option>
+            <option value="Bar">Bar</option>
+            <option value="Pizzería">Pizzería</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="submit"
+                class="w-full flex justify-center items-center rounded-md bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] shadow-md text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 active:opacity-[0.85] px-4 py-3 h-11">
+          <span *ngIf="!isLoading">Registrarse</span>
+          <div *ngIf="isLoading" class="animate-spin w-5 h-5 border-4 border-t-transparent border-white rounded-full"></div>
+        </button>
+      </div>
+    </form>
+
+    <p class="mt-8 text-center text-sm text-gray-500">
+      ¿Ya estás registrado?
+      <a [routerLink]="['/auth/login']" class="font-semibold text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text hover:opacity-80">
+        Inicia sesión
+      </a>
+    </p>
   </div>
-  
+</div>

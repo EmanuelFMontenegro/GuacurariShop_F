@@ -1,107 +1,90 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+// import { Component, OnInit } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { FacturaService } from '../../core/factura.service';
+// import { Producto, ProductoFactura } from '../../shared/models/Producto.model';
+// // import { ProductoService } from '../../core/producto.service';
 
-// Definir interfaces para seguridad de tipos
-interface Producto {
-  id: number;
-  nombre: string;
-  precio: number;
-}
+// @Component({
+//   selector: 'app-ventas',
+//   standalone: true,
+//   imports: [CommonModule, FormsModule],
+//   templateUrl: './ventas.component.html',
+//   styleUrls: ['./ventas.component.scss']
+// })
+// export class VentasComponent implements OnInit {
+//   selectedProduct: Producto | null = null;
+//   productos: Producto[] = [];
+//   carrito: Producto[] = [];
+//   totalVenta: number = 0;
 
-interface ProductoEnCarrito extends Producto {
-  cantidad: number; // Añadir cantidad
-}
+//   constructor( private facturaService: FacturaService) {}
 
-@Component({
-  selector: 'app-ventas',
-  imports: [CommonModule, FormsModule],
-  templateUrl: './ventas.component.html',
-  styleUrls: ['./ventas.component.scss']
-})
-export class VentasComponent {
-  // Productos disponibles
-  productos: Producto[] = [
-    { id: 1, nombre: 'Producto 1', precio: 100 },
-    { id: 2, nombre: 'Producto 2', precio: 200 },
-    { id: 3, nombre: 'Producto 3', precio: 300 },
-  ];
+//   // ngOnInit() {
+//   //   this.productoService.getProductos().subscribe((productos) => {
+//   //     this.productos = productos;
+//   //   });
+//   // }
 
-  // Carrito de compras (usando la interfaz ProductoEnCarrito)
-  carrito: ProductoEnCarrito[] = [];
-  totalVenta: number = 0;
-  selectedProduct: Producto | null = null;
-  
-  // Modal y producto nuevo
-  newProduct: Producto = { id: 0, nombre: '', precio: 0 }; // Aquí declaramos el nuevo producto
-  showProductModal: boolean = false; // Controla la visibilidad del modal
+//   agregarAlCarrito(producto: Producto) {
+//     const productoEnCarrito = this.carrito.find(p => p.id === producto.id);
 
-  // Agregar producto al carrito
-  agregarAlCarrito(producto: Producto) {
-    const productoEnCarrito: ProductoEnCarrito = {
-      ...producto,
-      cantidad: 1, // Inicializamos con cantidad 1
-    };
-    this.carrito.push(productoEnCarrito);
-    this.calcularTotal();
-  }
+//     if (productoEnCarrito) {
+//       productoEnCarrito.cantidad = (productoEnCarrito.cantidad ?? 0) + 1;
+//     } else {
+//       this.carrito.push({ ...producto, cantidad: 1 });
+//     }
 
-  // Calcular total de la venta
-  calcularTotal() {
-    this.totalVenta = this.carrito.reduce(
-      (total, producto) => total + producto.precio * producto.cantidad,
-      0
-    );
-  }
+//     this.calcularTotal();
+//   }
 
-  // Realizar la venta
-  realizarVenta() {
-    if (this.carrito.length > 0) {
-      alert(`Venta realizada. Total: $${this.totalVenta}`);
-      this.carrito = [];
-      this.totalVenta = 0;
-    } else {
-      alert('No hay productos en el carrito');
-    }
-  }
+//   calcularTotal() {
+//     this.totalVenta = this.carrito.reduce(
+//       (total, producto) => total + producto.precioVenta * (producto.cantidad ?? 0),
+//       0
+//     );
+//   }
 
-  // Escanear código de barras
-  escanearCodigo(codigo: string) {
-    const productoEncontrado = this.productos.find(
-      (p) => p.id.toString() === codigo
-    );
-    if (productoEncontrado) {
-      this.agregarAlCarrito(productoEncontrado);
-    } else {
-      alert('Producto no encontrado');
-    }
-  }
+//   realizarVenta() {
+//     if (this.carrito.length > 0) {
+//       const fechaVenta = new Date();
+//       const productosParaFactura: ProductoFactura[] = this.carrito.map(producto => ({
+//         id: producto.id,
+//         nombre: producto.nombre,
+//         precio: producto.precioVenta,
+//         precioCompra: producto.precioCompra,
+//         precioVenta: producto.precioVenta,
+//         stock: producto.stock,
+//         categoria: producto.categoria,
+//         modoEdicion: false
+//       }));
 
-  // Evento de entrada del código de barras
-  onBarcodeInput(event: any) {
-    const codigo = event.target.value;
-    this.escanearCodigo(codigo);
-  }
+//       this.facturaService.generarFactura(productosParaFactura, this.totalVenta, fechaVenta);
 
-  // Eliminar un producto del carrito
-  removeItem(item: ProductoEnCarrito) {
-    this.carrito = this.carrito.filter((p) => p !== item);
-    this.calcularTotal();
-  }
+//       const total = this.totalVenta;
 
-  // Completar la venta
-  completeSale() {
-    this.realizarVenta();
-  }
+//       this.carrito = [];
+//       this.totalVenta = 0;
 
-  // Guardar nuevo producto
-  saveNewProduct() {
-    if (this.newProduct.nombre && this.newProduct.precio) {
-      this.productos.push({ ...this.newProduct, id: this.productos.length + 1 });
-      this.newProduct = { id: 0, nombre: '', precio: 0 }; // Resetear nuevo producto
-      this.showProductModal = false; // Cerrar el modal
-    } else {
-      alert('Por favor, complete todos los campos.');
-    }
-  }
-}
+//       alert(`Venta realizada. Total: $${total}. Factura generada con éxito.`);
+//     } else {
+//       alert('No hay productos en el carrito');
+//     }
+//   }
+
+//   removeItem(producto: Producto): void {
+//     this.carrito = this.carrito.filter(item => item.id !== producto.id);
+//     this.calcularTotal();
+//   }
+
+//   onBarcodeInput(event: any) {
+//     const codigo = event.target.value.trim();
+//     const producto = this.productos.find(p => p.id === codigo);
+
+//     if (producto) {
+//       this.agregarAlCarrito({ ...producto, cantidad: producto.cantidad ?? 1 });
+//     } else {
+//       alert("Producto no encontrado");
+//     }
+//   }
+// }

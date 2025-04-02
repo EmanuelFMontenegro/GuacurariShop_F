@@ -1,52 +1,53 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { supabase } from '../supabase/supabaseClient';
-import { VarianteProducto } from './models/variante-producto.model';
-
-export interface Cliente {
-  email: string;
-  password: string;
-  telefono: string;
-  status: string;
-}
+import { VarianteProducto } from '../shared/models/variante-producto.model';
+import { Category } from '../shared/models/Category.model';
+import { AuthService } from './auth.service';  
+import { v4 as uuidv4 } from 'uuid';
+import { Producto } from '../shared/models/Producto.model';
+import { Cliente } from '../shared/models/Cliente.model';
+import { environment } from '../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  private readonly CLIENTE_ACTIVO = 'activo';
-  private readonly TABLE_VARIANTES = 'variantes_producto';
-  private readonly TABLE_CLIENTES = 'clientes';
+  private readonly API_URL = environment.apiUrl;
+  
+  constructor(private authService: AuthService, private http: HttpClient) {}
 
+  
   registerCliente(email: string, password: string, telefono: string): Observable<Cliente> {
-    return from(
-      supabase
-        .from('clientes')
-        .insert([{ email, password, telefono, status: this.CLIENTE_ACTIVO }])
-        .select()
-        .single()
-    ).pipe(
-      map(({ data }) => data as Cliente),
-      catchError((error) => {
-        console.error('Error al registrar cliente:', error);
-        throw error;
-      })
-    );
+    return this.http.post<Cliente>(`${this.API_URL}/clientes`, { email, password, telefono });
   }
 
+  
   getVariantesPorProducto(productoId: string): Observable<VarianteProducto[]> {
-    return from(
-      supabase
-        .from(this.TABLE_VARIANTES)
-        .select('*')
-        .eq('producto_id', productoId)
-    ).pipe(
-      map(({ data }) => (data as VarianteProducto[]) || []),
-      catchError((error) => {
-        console.error('Error al obtener variantes del producto:', error);
-        return [[]]; // Retorna un array vacío en caso de error
-      })
-    );
+    return this.http.get<VarianteProducto[]>(`${this.API_URL}/variantes_producto?producto_id=${productoId}`);
+  }
+
+  
+  agregarProducto(producto: Omit<Producto, 'id'>): Observable<Producto> {
+    const productoConUuid = {
+      ...producto,
+      id: uuidv4(),
+    };
+    return this.http.post<Producto>(`${this.API_URL}/productos`, productoConUuid);
+  }
+
+  getProductos(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.API_URL}/productos`);
+  }
+
+  
+  editarProducto(id: string, producto: Producto): Observable<Producto> {
+    return this.http.put<Producto>(`${this.API_URL}/productos/${id}`, producto);
+  }
+
+
+  eliminarProducto(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/productos/${id}`);
   }
 }

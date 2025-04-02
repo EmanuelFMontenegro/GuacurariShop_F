@@ -1,27 +1,36 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import { CanActivate, Router } from '@angular/router';
+import { Observable, combineLatest, of } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { AuthService } from '../auth.service';
-import { Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean> {
-    return this.authService.isAuthenticated().pipe(
-      take(1),
-      map((isAuthenticated) => {
+  canActivate(): Observable<boolean> {
+    return combineLatest([
+      this.authService.isAuthenticated(),
+      this.authService.userRoles$
+    ]).pipe(
+      map(([isAuthenticated, roles]) => {
+       
         if (!isAuthenticated) {
-          this.router.navigate(['/auth/login']); // Redirige al login si no está autenticado
+          console.warn('Usuario no autenticado, redirigiendo a login');
+          this.router.navigate(['/auth/login']);
           return false;
         }
-        return true;
+
+       
+        if (roles.includes('ROLE_USER') || roles.includes('ROLE_ADMIN') || roles.includes('SUPER-ADMIN')) {
+          return true;
+        }
+
+        console.warn('Acceso denegado, redirigiendo a /unauthorized');
+        this.router.navigate(['/unauthorized']);
+        return false;
       })
     );
   }

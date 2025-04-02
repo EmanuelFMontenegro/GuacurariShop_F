@@ -15,15 +15,13 @@ export class SidebarComponent {
   constructor(private authService: AuthService,private router: Router) {}
 
  
-  logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        console.log('Sesión cerrada correctamente');      
-      },
-      error: (error) => {
-        console.error('Error al cerrar sesión', error);
-      }
-    });
+  async logout(): Promise<void> {
+    try {
+      await this.authService.logout();
+      console.log('Sesión cerrada correctamente.');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   }
   
   

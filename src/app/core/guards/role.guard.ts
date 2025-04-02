@@ -1,26 +1,43 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, take, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RoleGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  canActivate(): Observable<boolean> {
-    return this.authService.getRole().pipe(
-      map(role => {
-        // Si el rol es "admin", se permite el acceso
-        if (role === 'admin') {
+  canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
+    const expectedRoles: string[] = route.data['expectedRoles'] || [];
+
+    return this.authService.userRoles$.pipe(
+      take(1),
+      map((userRoles: string[]) => {
+        if (!userRoles || userRoles.length === 0) {
+          this.router.navigate(['/auth/login']);
+          return false;
+        }
+
+        
+        if (userRoles.includes('ROLE_ADMIN') || userRoles.includes('SUPER-ADMIN')) {
           return true;
         }
 
-        // Si el rol es distinto de "admin", redirige al dashboard o una página de error
-        this.router.navigate(['/']);
+        if (expectedRoles.some(role => userRoles.includes(role))) {
+          return true;
+        }
+
+        
+        this.router.navigate(['/unauthorized']);
         return false;
+      }),
+      catchError(() => {
+        this.router.navigate(['/auth/login']);
+        return of(false);
       })
     );
   }

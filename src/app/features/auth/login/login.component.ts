@@ -1,53 +1,68 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { AuthService } from '../../../core/auth.service';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr'; // Importa el servicio Toastr
-import { RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { Router, RouterLink } from '@angular/router';
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
-  email: string = '';
-  password: string = '';
-  errorMessage: string = '';
-  isLoading: boolean = false;
-  passwordVisible: boolean = false;
+  loginForm: FormGroup;
+  isLoading = signal(false);
+  passwordVisible = signal(false);
 
-  constructor(private authService: AuthService, private toastr: ToastrService) {}
-
-  login(): void {
-    this.isLoading = true;
-    this.authService.login(this.email, this.password).subscribe({
-      next: (user) => {
-        // Solo si el login es exitoso, mostramos el mensaje de éxito
-        console.log('Usuario autenticado:', user);
-        this.isLoading = false;
-        this.toastr.success('Bienvenido, sesión iniciada correctamente.');
-      },
-      error: (error: any) => {
-        this.isLoading = false;
-
-        // Logueamos el error para ver qué se está capturando
-        console.log('Error recibido en el componente:', error);
-
-        // Verificamos si el error es 'invalid_credentials'
-        if (error.message === 'invalid_credentials') {
-          this.toastr.error('Correo o contraseña incorrectos. Por favor, revisa tus datos e intenta nuevamente.');
-        } else {
-          // En caso de cualquier otro error
-          this.toastr.error('Hubo un error al iniciar sesión. Intenta nuevamente.');
-        }
-      }
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private toastr: ToastrService,
+    private router: Router
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required]
     });
   }
 
-  togglePasswordVisibility(): void {
-    this.passwordVisible = !this.passwordVisible;
+  login(): void {
+    if (this.loginForm.invalid) {
+      this.toastr.error('Por favor, completa todos los campos correctamente.');
+      return;
+    }
+  
+    this.isLoading.set(true);
+    const { email, password } = this.loginForm.value;
+  
+    this.authService.login(email, password).pipe(
+      catchError(error => {
+        this.handleLoginError(error);
+        return of(null);
+      })
+    ).subscribe(response => {
+      if (response && response.status === 200) {
+        this.toastr.success('Bienvenido al Sistema');
+        this.router.navigate(['/dashboard']);
+      }
+    }).add(() => {
+      this.isLoading.set(false);
+    });
   }
+
+  private handleLoginError(error: any): void {
+    const errorMessage = error?.error?.message || 'Error al iniciar sesión. Verifique sus credenciales.';
+    this.toastr.error(errorMessage);
+  }
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible.update(prev => !prev);
+  }
+
+  get email() { return this.loginForm.get('email'); }
+  get password() { return this.loginForm.get('password'); }
 }

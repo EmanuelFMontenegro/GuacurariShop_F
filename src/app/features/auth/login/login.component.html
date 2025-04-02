@@ -4,64 +4,107 @@
     <!-- Logo y título dentro de la tarjeta -->
     <div class="text-center relative">
       <img class="mx-auto max-h-28 w-auto scale-110 mb-[-8px] pb-4" src="/guacurari_tech.png" alt="GuacurariShop">
-      <h2 class="text-2xl font-bold text-transparent bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] bg-clip-text pb-4">
+      <h2 class="text-2xl font-bold text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text pb-4">
         Bienvenido a GuacuShop
       </h2>
     </div>
     
     <!-- Formulario de login -->
-    <form class="space-y-6 mt-6" (ngSubmit)="login()">
+    <form class="space-y-6 mt-6" [formGroup]="loginForm" (ngSubmit)="login()">
+      <!-- Campo Email -->
       <div>
-        <label for="email" class="block text-sm font-medium text-gray-900">Correo electrónico</label>
+        <label for="email" class="block text-sm font-medium text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+          Correo electrónico
+        </label>
         <div class="mt-2 flex items-center">
-          <span class="material-symbols-outlined mr-2 bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] text-transparent bg-clip-text">
+          <span class="material-symbols-outlined mr-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
             person
           </span>
-          <input type="email" id="email" [(ngModel)]="email" name="email" autocomplete="email" required 
-                 class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
-                        focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm">
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email"
+            [class.invalid]="email?.invalid && (email?.touched || email?.dirty)"
+            class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+                   focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm"
+            autocomplete="email"
+          >
         </div>
+        @if (email?.invalid && (email?.touched || email?.dirty)) {
+          <div class="text-red-500 text-sm mt-1 ml-7">
+            @if (email?.errors?.['required']) { Campo requerido }
+            @if (email?.errors?.['email']) { Formato de email inválido }
+          </div>
+        }
       </div>
 
+      <!-- Campo Contraseña -->
       <div>
         <div class="flex items-center justify-between">
-          <label for="password" class="block text-sm font-medium text-gray-900">Contraseña</label>
+          <label for="password" class="block text-sm font-medium text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+            Contraseña
+          </label>
           <div class="text-sm">
-            <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">¿Olvidaste tu contraseña?</a>
+            <a href="#" class="font-semibold text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text hover:opacity-80">
+              ¿Olvidaste tu contraseña?
+            </a>
           </div>
         </div>
         <div class="mt-2 flex items-center relative">
-          <span class="material-symbols-outlined mr-2 bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] text-transparent bg-clip-text">
+          <span class="material-symbols-outlined mr-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
             passkey
-          </span>          
-          <input [type]="passwordVisible ? 'text' : 'password'" id="password" [(ngModel)]="password" name="password" 
-                 autocomplete="current-password" required 
-                 class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
-                        focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm pr-10">
-          <span (click)="togglePasswordVisibility()" class="material-symbols-outlined cursor-pointer absolute right-2 text-[#9B59B6]">
-            {{ passwordVisible ? 'visibility' : 'visibility_off' }} <!-- Cambio aquí -->
           </span>
-        </div>        
+          <input 
+            [type]="passwordVisible() ? 'text' : 'password'" 
+            id="password" 
+            formControlName="password"
+            [class.invalid]="password?.invalid && (password?.touched || password?.dirty)"
+            class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+                   focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm pr-10"
+            autocomplete="current-password"
+          >
+          <span 
+            (click)="togglePasswordVisibility()" 
+            class="material-symbols-outlined cursor-pointer absolute right-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text"
+          >
+            @if (passwordVisible()) { visibility } @else { visibility_off }
+          </span>
+        </div>
+        @if (password?.invalid && (password?.touched || password?.dirty)) {
+          <div class="text-red-500 text-sm mt-1 ml-7">
+            @if (password?.errors?.['required']) { Campo requerido }
+            @if (password?.errors?.['minlength']) { Mínimo 6 caracteres }
+          </div>
+        }
       </div>
+
+      <!-- Botón de Submit -->
       <div>
-        <button type="submit" 
-                class="w-full flex justify-center items-center rounded-md bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] 
-                       shadow-md text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 
-                       active:opacity-[0.85] px-4 py-3 h-11">
-          <span *ngIf="!isLoading">Iniciar sesión</span>
-          <div *ngIf="isLoading" class="animate-spin w-5 h-5 border-4 border-t-transparent border-white rounded-full"></div>
+        <button 
+          type="submit" 
+          [disabled]="loginForm.invalid || isLoading()"
+          class="w-full flex justify-center items-center rounded-md bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] 
+                 shadow-md text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 
+                 active:opacity-[0.85] px-4 py-3 h-11"
+        >
+          @if (!isLoading()) {
+            Iniciar sesión
+          } @else {
+            <div class="animate-spin w-5 h-5 border-4 border-t-transparent border-white rounded-full"></div>
+          }
         </button>
       </div>
-            
     </form>
 
     <!-- Mensaje de registro -->
     <p class="mt-10 text-center text-sm text-gray-500">
       ¿No estás registrado?
-      <a routerLink="/auth/registro" class="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
+      <a 
+        routerLink="/auth/registro" 
+        class="font-semibold text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text hover:opacity-80 cursor-pointer"
+      >
         Comienza una prueba gratis de 30 días
       </a>
     </p>
-    
   </div>
 </div>

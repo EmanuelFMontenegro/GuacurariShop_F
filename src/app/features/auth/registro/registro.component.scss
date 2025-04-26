@@ -1,0 +1,19 @@
+:host {
+    ::ng-deep {
+      .text-red-600 {
+        min-height: 1.2rem;
+        display: block;
+        font-size: 0.75rem;
+        line-height: 1rem;
+      }
+      
+      input, select {
+        height: 2.5rem;
+        transition: all 0.3s ease;
+      }
+  
+      .material-symbols-outlined {
+        font-size: 18px;
+      }
+    }
+  }

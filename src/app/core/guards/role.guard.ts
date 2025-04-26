@@ -1,44 +1,26 @@
-import { Injectable, inject } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
-import { AuthService } from '../auth.service';
-import { Observable, of } from 'rxjs';
-import { map, take, catchError } from 'rxjs/operators';
+import { inject } from '@angular/core';
+import { CanActivateFn, ActivatedRouteSnapshot, Router } from '@angular/router';
+import { AuthService } from '@core/services/auth.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { map} from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RoleGuard implements CanActivate {
-  private authService = inject(AuthService);
-  private router = inject(Router);
 
-  canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
-    const expectedRoles: string[] = route.data['expectedRoles'] || [];
+export const RoleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-    return this.authService.userRoles$.pipe(
-      take(1),
-      map((userRoles: string[]) => {
-        if (!userRoles || userRoles.length === 0) {
-          this.router.navigate(['/auth/login']);
-          return false;
-        }
+  const expectedRoles: string[] = route.data['expectedRoles'] || [];
+  const roles$ = toObservable(authService.userRoles); 
 
-        
-        if (userRoles.includes('ROLE_ADMIN') || userRoles.includes('SUPER-ADMIN')) {
-          return true;
-        }
-
-        if (expectedRoles.some(role => userRoles.includes(role))) {
-          return true;
-        }
-
-        
-        this.router.navigate(['/unauthorized']);
-        return false;
-      }),
-      catchError(() => {
-        this.router.navigate(['/auth/login']);
-        return of(false);
-      })
-    );
-  }
-}
+  return roles$.pipe(
+    map((roles: string[]) => {       
+      const hasAccess = roles.some(role => expectedRoles.includes(role));
+      if (!hasAccess) {
+        router.navigate(['/unauthorized']);
+      }
+  
+      return hasAccess;
+    })
+  );
+  
+};

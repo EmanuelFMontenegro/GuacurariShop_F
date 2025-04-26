@@ -1,32 +1,33 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, EnvironmentInjector } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { routes } from './app.routes';
-import { provideToastr } from 'ngx-toastr';
+import { provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import { provideZoneChangeDetection } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';  
-import { AuthInterceptor } from './core/auth.interceptor';
-import { HttpClient } from '@angular/common/http';
+import { provideToastr } from 'ngx-toastr';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+
+import { appInitializerFactory } from './core/initializers/app.initializer';
+import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
-  providers: [
+  providers: [   
     provideRouter(routes),
-    provideHttpClient(),
-    provideCharts(withDefaultRegisterables()),
-    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideHttpClient(withInterceptorsFromDi()), 
+    provideZoneChangeDetection({ eventCoalescing: true }),  
+    {
+      provide: APP_INITIALIZER,
+      useFactory: appInitializerFactory,
+      deps: [EnvironmentInjector],
+      multi: true,
+    },  
     provideAnimations(),
     provideToastr({
-      timeOut: 3000, 
-      positionClass: 'toast-top-right', 
-      preventDuplicates: true, 
-      maxOpened: 1, 
+      timeOut: 3000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+      maxOpened: 1,
     }),
-   
-    provideHttpClient(withInterceptorsFromDi()),    
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    }    
-  ]
+    provideCharts(withDefaultRegisterables()),
+  ],
 };
+

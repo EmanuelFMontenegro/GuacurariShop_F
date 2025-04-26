@@ -1,1 +1,42 @@
-<p>cajas works!</p>
+<div class="p-4">
+  <h2 class="text-2xl font-semibold mb-4 text-primary">🧾 Cajas</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    @for (caja of cajas(); track caja.id) {
+      <div
+        class="rounded-2xl shadow-md p-4 border border-gray-200"
+        [ngClass]="{
+          'bg-green-50 border-green-300': caja.estado === 'Abierta',
+          'bg-red-50 border-red-300': caja.estado === 'Cerrada'
+        }"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-bold text-lg">Caja #{{ caja.id }}</span>
+          <span
+            class="px-2 py-1 text-sm rounded-xl font-medium"
+            [ngClass]="{
+              'bg-green-100 text-green-700': caja.estado === 'Abierta',
+              'bg-red-100 text-red-700': caja.estado === 'Cerrada'
+            }"
+          >
+            {{ caja.estado }}
+          </span>
+        </div>
+
+        <div class="text-sm text-gray-700">
+          <p>Apertura: {{ caja.apertura }}</p>
+          @if (caja.estado === 'Cerrada') {
+            <p>Cierre: {{ caja.cierre }}</p>
+          }
+          <p class="mt-2 font-semibold text-primary">
+            Total: ${{ caja.total | number }}
+          </p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="mt-6 text-sm text-gray-500">
+    Total de cajas abiertas: {{ totalCajasAbiertas() }}
+  </div>
+</div>

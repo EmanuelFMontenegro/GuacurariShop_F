@@ -1,9 +1,9 @@
-import { Component, computed, effect, signal } from '@angular/core';
+import { Component,signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../../core/auth.service';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-resetear-contrasena',

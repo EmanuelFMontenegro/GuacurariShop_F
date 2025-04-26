@@ -1,5 +1,5 @@
 export interface Producto {
-  id: string;
+  productoId: string; 
   nombre: string;
   descripcion?: string;
   precio?: number;  
@@ -9,12 +9,12 @@ export interface Producto {
   categoria: string;
   cantidad?: number;
   codigoBarras?: string;
-  modoEdicion:boolean;
+  modoEdicion: boolean;
 }
 
 
 export interface ProductoFactura {
-  id: string;
+  productoId: string; 
   nombre: string;
   precio: number;
   precioCompra: number;
@@ -23,3 +23,4 @@ export interface ProductoFactura {
   categoria: string;
   modoEdicion: boolean;
 }
+

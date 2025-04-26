@@ -1,80 +1,117 @@
-// import { Component } from '@angular/core';
-// import { ApiService } from '../../../core/api.service';
-// import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
-// import { ToastrService } from 'ngx-toastr';
-// import { Router, RouterLink } from '@angular/router';
-// import { supabase } from '../../../supabase/supabaseClient';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '@core/services/auth.service';
+import { RubroService } from '@core/rubro.service';
 
-// @Component({
-//   standalone: true,
-//   selector: 'app-registro',
-//   imports: [CommonModule, FormsModule, RouterLink],
-//   templateUrl: './registro.component.html',
-//   styleUrls: ['./registro.component.scss'],
-// })
-// export class RegistroComponent {
-//   email: string = '';
-//   password: string = '';
-//   passwordVisible: boolean = false;
-//   isLoading: boolean = false;
-//   telefono: string = '';
-//   rubro: string = 'Kiosko';  // Valor inicial del rubro
-//   roleName: string = 'empleado';  // Valor por defecto del rol (puedes cambiarlo según lo que necesites)
+@Component({
+  standalone: true,
+  selector: 'app-registro',
+  imports: [CommonModule, FormsModule, RouterLink, ReactiveFormsModule],
+  templateUrl: './registro.component.html',
+  styleUrls: ['./registro.component.scss'],
+})
+export class RegistroComponent implements OnInit {
+  registerForm: FormGroup;
+  passwordVisible: boolean = false;
+  isLoading: boolean = false;
+  rubros: string[] = [];
+  role: string = 'ADMIN';
+  errorMsg: string = '';
+  esPrimerRegistro: boolean = true;
+  submitted: boolean = false;
 
-//   constructor(private apiService: ApiService, private toastr: ToastrService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private toastr: ToastrService,
+    private router: Router,
+    private rubroService: RubroService
+  ) {
+    this.registerForm = this.fb.group({
+      registerUsername: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      registerPassword: ['', [
+        Validators.required,
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
+      ]],
+      telefono: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      rubro: ['Kiosko', Validators.required]
+    });
+  }
 
-//   togglePasswordVisibility() {
-//     this.passwordVisible = !this.passwordVisible;
-//   }
+  ngOnInit(): void {
+    this.resetForm();
+    this.cargarRubros();
+  }
 
-//   // Función para registrar un nuevo cliente con su rol específico
-//   registerCliente() {
-//     this.isLoading = true;
-  
-//     supabase.auth.signUp({ email: this.email, password: this.password }).then(({ data, error }) => {
-//       this.isLoading = false;
-  
-//       if (error) {
-//         this.toastr.error(error.message, 'Error al registrar en Supabase');
-//         return;
-//       }
-  
-//       if (data.user) {
-//         // Obtener el ID del rol
-//         supabase
-//           .from('roles')
-//           .select('id')
-//           .eq('name', this.roleName) // Asignar el rol según el valor roleName
-//           .single()
-//           .then(({ data: roleData, error: roleError }) => {
-//             if (roleError) {
-//               this.toastr.error(roleError.message, 'Error al obtener el rol');
-//               return;
-//             }
+  private resetForm(): void {
+    this.registerForm.reset({
+      registerUsername: '',
+      email: '',
+      registerPassword: '',
+      telefono: '',
+      rubro: 'Kiosko'
+    });
+  }
 
-//             // Insertar cliente en la base de datos con el rol
-//             supabase
-//               .from('clientes')
-//               .insert([
-//                 {
-//                   email: this.email,
-//                   password: this.password,
-//                   telefono: this.telefono,
-//                   rubro: this.rubro,
-//                   role_id: roleData?.id,  // Asignar el ID del rol al cliente
-//                 }
-//               ])
-//               .then(({ error }) => {
-//                 if (error) {
-//                   this.toastr.error(error.message, 'Error al guardar cliente en la base de datos');
-//                 } else {
-//                   this.toastr.success('Registro exitoso. Revisa tu correo para confirmar.', '¡Bienvenido!');
-//                   this.router.navigate(['/login']);
-//                 }
-//               });
-//           });
-//       }
-//     });
-//   }
-// }
+  private cargarRubros() {
+    this.rubroService.getRubros().subscribe({
+      next: (data) => (this.rubros = data),
+      error: (err) => console.error('Error al cargar rubros', err),
+    });
+  }
+
+  togglePasswordVisibility() {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
+  registerCliente() {
+    this.submitted = true;
+    this.registerForm.markAllAsTouched();
+
+    if (this.registerForm.invalid) {
+      this.toastr.warning('Debe completar todo el formulario correctamente.', 'Atención !!!');
+      return;
+    }
+
+    this.isLoading = true;
+    
+    const { 
+      registerUsername: username, 
+      email, 
+      registerPassword: password, 
+      telefono, 
+      rubro 
+    } = this.registerForm.value;
+
+    this.authService.register(username, email, password, telefono, rubro, this.role).subscribe({
+      next: () => {
+        const mensaje = this.esPrimerRegistro
+          ? 'Admin registrado exitosamente. ¡Bienvenido!'
+          : 'Registro exitoso. Revisa tu correo para confirmar.';
+
+        this.toastr.success(mensaje, '¡Éxito!');
+        this.router.navigate(['/auth/login']);
+        this.resetForm();
+        this.submitted = false;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.toastr.error(err.message || 'Error en el registro', 'Error');
+        console.error('Error:', err);
+        this.errorMsg = err.message;
+        this.isLoading = false;
+      }
+    });
+  }
+
+  soloNumeros(event: KeyboardEvent): void {
+    const charCode = event.key;
+    if (!/^[0-9]$/.test(charCode)) {
+      event.preventDefault();
+    }
+  }
+}

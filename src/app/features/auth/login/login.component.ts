@@ -1,10 +1,11 @@
 import { Component, signal } from '@angular/core';
-import { AuthService } from '../../../core/auth.service';
+import { AuthService } from '@core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { Router, RouterLink } from '@angular/router';
-import { catchError, of } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import { catchError, finalize, of } from 'rxjs';
+import { Router } from '@angular/router'; 
 
 @Component({
   selector: 'app-login',
@@ -23,6 +24,7 @@ export class LoginComponent {
     private authService: AuthService,
     private toastr: ToastrService,
     private router: Router
+    
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -41,28 +43,29 @@ export class LoginComponent {
   
     this.authService.login(email, password).pipe(
       catchError(error => {
-        this.handleLoginError(error);
-        return of(null);
-      })
+        const errorMessage = this.authService.extractErrorMessage(error);
+        if (errorMessage.includes('no registrado') || error.status === 404) {
+         
+          this.toastr.info('No estás registrado. Redirigiendo al registro...', 'Usuario no encontrado');
+          this.router.navigate(['/auth/registro']);
+        } else {
+          this.toastr.error(errorMessage, 'Error de inicio de sesión');
+        }
+        return of(null); 
+      }),
+      finalize(() => this.isLoading.set(false)) 
     ).subscribe(response => {
       if (response && response.status === 200) {
-        this.toastr.success('Bienvenido al Sistema');
-        this.router.navigate(['/dashboard']);
+        this.toastr.success('Login exitoso', 'Bienvenido');
       }
-    }).add(() => {
-      this.isLoading.set(false);
     });
   }
-
-  private handleLoginError(error: any): void {
-    const errorMessage = error?.error?.message || 'Error al iniciar sesión. Verifique sus credenciales.';
-    this.toastr.error(errorMessage);
-  }
-
+  
   togglePasswordVisibility(): void {
     this.passwordVisible.update(prev => !prev);
   }
 
   get email() { return this.loginForm.get('email'); }
   get password() { return this.loginForm.get('password'); }
+
 }

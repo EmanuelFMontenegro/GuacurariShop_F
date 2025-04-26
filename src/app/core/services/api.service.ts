@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { VarianteProducto } from '../shared/models/variante-producto.model';
-import { Category } from '../shared/models/Category.model';
-import { AuthService } from './auth.service';  
+import { Observable} from 'rxjs';
+
+import { VarianteProducto } from '../../shared/models/variante-producto.model';
+
+
 import { v4 as uuidv4 } from 'uuid';
-import { Producto } from '../shared/models/Producto.model';
-import { Cliente } from '../shared/models/Cliente.model';
-import { environment } from '../../environments/environment';
+import { Producto } from '../../shared/models/Producto.model';
+import { Cliente } from '../../shared/models/Cliente.model';
+import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -16,11 +16,11 @@ import { HttpClient } from '@angular/common/http';
 export class ApiService {
   private readonly API_URL = environment.apiUrl;
   
-  constructor(private authService: AuthService, private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   
-  registerCliente(email: string, password: string, telefono: string): Observable<Cliente> {
-    return this.http.post<Cliente>(`${this.API_URL}/clientes`, { email, password, telefono });
+  registerCliente(email: string, password: string, telefono: string,role:string): Observable<Cliente> {
+    return this.http.post<Cliente>(`${this.API_URL}/clientes`, { email, password, telefono,role });
   }
 
   
@@ -49,5 +49,5 @@ export class ApiService {
 
   eliminarProducto(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/productos/${id}`);
-  }
+  }  
 }

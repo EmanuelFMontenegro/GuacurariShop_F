@@ -1,43 +1,121 @@
-// import { Injectable } from '@angular/core';
-// import { AuthService } from './auth.service';
-// import { Observable, of } from 'rxjs';
-// import { switchMap } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from './services/auth.service';
+import { Observable, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { environment } from '@environments/environment';
 
-// @Injectable({
-//   providedIn: 'root',
-// })
-// export class CategoryService {
-//   constructor(private authService: AuthService) {}
+// Interface que corresponde a la entidad Categoria del backend
+export interface Categoria {
+  id?: number;
+  nombre: string;
+  descripcion?: string;
+  // Agrega aquí otros campos que tenga la entidad Categoria en tu backend
+}
 
-//   getCategories() {
-//     return this.authService.getUser().pipe(
-//       switchMap(user => {
-//         if (!user) {
-//           return of([]);  // Si no hay usuario, retornamos un array vacío (o manejas el caso como desees)
-//         }
-//         return this.getCategoriesForUser(user.id); // Aquí accedes al id del usuario
-//       })
-//     );
-//   }
+@Injectable({
+  providedIn: 'root',
+})
+export class CategoryService {
+  private apiUrl = `${environment.apiUrl}/categorias`;
 
-//   insertCategory(name: string): Observable<any> {
-//     return this.authService.getUser().pipe(
-//       switchMap(user => {
-//         if (!user) {
-//           return of(null);  // Manejo cuando no hay usuario
-//         }
-//         return this.insertCategoryForUser(user.id, name); // Usamos el id del usuario
-//       })
-//     );
-//   }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
-//   private getCategoriesForUser(userId: string): Observable<any> {
-//     // Lógica para obtener las categorías basadas en el userId
-//     return of([]);  // Esto es solo un ejemplo, deberías hacer la consulta real
-//   }
+  // Obtener todas las categorías
+  getCategories(): Observable<Categoria[]> {
+    return this.authService.getUser().pipe(
+      switchMap(user => {
+        if (!user) {
+          return of([]);
+        }
+        
+        // Utilizamos el token del usuario si es necesario para la autenticación
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${user.token}`
+        });
+        
+        return this.http.get<Categoria[]>(this.apiUrl, { headers })
+          .pipe(
+            catchError(error => {
+              console.error('Error al obtener categorías:', error);
+              return of([]);
+            })
+          );
+      })
+    );
+  }
 
-//   private insertCategoryForUser(userId: string, name: string): Observable<any> {
-//     // Lógica para insertar la categoría basada en el userId
-//     return of({});  // Esto es solo un ejemplo, deberías hacer la inserción real
-//   }
-// }
+  // Obtener una categoría por ID
+  getCategoryById(id: number): Observable<Categoria | null> {
+    return this.authService.getUser().pipe(
+      switchMap(user => {
+        if (!user) {
+          return of(null);
+        }
+        
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${user.token}`
+        });
+        
+        return this.http.get<Categoria>(`${this.apiUrl}/${id}`, { headers })
+          .pipe(
+            catchError(error => {
+              console.error(`Error al obtener la categoría con ID ${id}:`, error);
+              return of(null);
+            })
+          );
+      })
+    );
+  }
+
+  // Crear una nueva categoría
+  createCategory(categoria: Categoria): Observable<Categoria | null> {
+    return this.authService.getUser().pipe(
+      switchMap(user => {
+        if (!user) {
+          return of(null);
+        }
+        
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${user.token}`,
+          'Content-Type': 'application/json'
+        });
+        
+        return this.http.post<Categoria>(this.apiUrl, categoria, { headers })
+          .pipe(
+            catchError(error => {
+              console.error('Error al crear la categoría:', error);
+              return of(null);
+            })
+          );
+      })
+    );
+  }
+
+  // Eliminar una categoría
+  deleteCategory(id: number): Observable<boolean> {
+    return this.authService.getUser().pipe(
+      switchMap(user => {
+        if (!user) {
+          return of(false);
+        }
+        
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${user.token}`
+        });
+        
+        return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers })
+          .pipe(
+            switchMap(() => of(true)),
+            catchError(error => {
+              console.error(`Error al eliminar la categoría con ID ${id}:`, error);
+              return of(false);
+            })
+          );
+      })
+    );
+  }
+}

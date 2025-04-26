@@ -8,7 +8,7 @@
 
   <div class="mb-6 grid grid-cols-3 gap-4">
     <div class="col-span-2">
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="product-code">
+      <label for="product-code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Código de Barras
       </label>
       <input
@@ -21,7 +21,7 @@
     </div>
     
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="product-name">
+      <label for="product-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Producto Seleccionado
       </label>
       <input
@@ -54,13 +54,15 @@
               type="number" 
               [(ngModel)]="item.cantidad"
               min="1"
-              class="w-16 p-1 text-center rounded-md border-gray-300 dark:bg-gray-700 dark:text-white"
+              class="w-16 p-1 text-center rounded-md border border-gray-300 dark:bg-gray-700 dark:text-white"
+              (change)="actualizarSubtotal(item)"
             />
           </td>
           <td class="px-4 py-2 text-right">${{ item.precio | number: '1.2-2' }}</td>
-          <td class="px-4 py-2 text-right">producto.cantidad!.toString();
-
+          <td class="px-4 py-2 text-right">
+            ${{ actualizarSubtotal(item) | number: '1.2-2' }}
           </td>
+          
           <td class="px-4 py-2 text-center">
             <button (click)="removeItem(item)" class="text-red-600 font-semibold hover:underline">Eliminar</button>
           </td>
@@ -72,7 +74,9 @@
   <div class="flex justify-between items-center border-t pt-4">
     <div>
       <span class="text-lg text-gray-600 dark:text-gray-300">Total</span>
-      <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">${{ totalVenta | number: '1.2-2' }}</h3>
+      <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+        ${{ totalVenta | number: '1.2-2' }}
+      </h3>
     </div>
     <button
       class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-200"

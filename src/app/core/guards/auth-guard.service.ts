@@ -1,37 +1,37 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-import { Observable, combineLatest, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { AuthService } from '../auth.service';
+import { CanActivateFn, ActivatedRouteSnapshot } from '@angular/router';
+import { inject } from '@angular/core';
+import { AuthService } from '@core/services/auth.service';
+import { Router } from '@angular/router';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { switchMap, of } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';  // Para notificaciones
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AuthGuard implements CanActivate {
-  constructor(private router: Router, private authService: AuthService) {}
+export const AuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const toastr = inject(ToastrService); // Para mostrar notificaciones
 
-  canActivate(): Observable<boolean> {
-    return combineLatest([
-      this.authService.isAuthenticated(),
-      this.authService.userRoles$
-    ]).pipe(
-      map(([isAuthenticated, roles]) => {
-       
-        if (!isAuthenticated) {
-          console.warn('Usuario no autenticado, redirigiendo a login');
-          this.router.navigate(['/auth/login']);
-          return false;
-        }
+  const isAuth$ = toObservable(authService.isAuthenticated);
+  const expectedRoles = route.data?.['roles'] as string[] || [];
 
-       
-        if (roles.includes('ROLE_USER') || roles.includes('ROLE_ADMIN') || roles.includes('SUPER-ADMIN')) {
-          return true;
-        }
+  return isAuth$.pipe(
+    switchMap(isAuth => {
+      if (!isAuth) {
+        toastr.warning('No estás autenticado. Redirigiendo al login...', 'Autenticación requerida');
+        router.navigate(['/auth/login']);
+        return of(false);
+      }
 
-        console.warn('Acceso denegado, redirigiendo a /unauthorized');
-        this.router.navigate(['/unauthorized']);
-        return false;
-      })
-    );
-  }
-}
+      const userRoles = authService.userRoles();
+      const hasRole = expectedRoles.length === 0 || userRoles.some(role => expectedRoles.includes(role));
+
+      if (!hasRole) {
+        toastr.warning('No tienes permisos suficientes para acceder a esta página.', 'Acceso denegado');
+        router.navigate(['/unauthorized']);
+        return of(false);
+      }
+
+      return of(true);
+    })
+  );
+};

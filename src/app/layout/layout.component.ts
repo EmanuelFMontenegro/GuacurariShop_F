@@ -3,7 +3,7 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { FooterComponent } from './footer/footer.component';
 import { RouterOutlet } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+
 @Component({
   selector: 'app-layout',
   imports: [SidebarComponent,NavbarComponent,FooterComponent,RouterOutlet],

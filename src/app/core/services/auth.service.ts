@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/htt
 import { Router } from '@angular/router';
 import { catchError, map, tap } from 'rxjs';
 import { Observable, of, throwError } from 'rxjs';
-import { ConfigService } from './ConfigService';
+import { environment } from '@environments/environment';
 import { toObservable } from '@angular/core/rxjs-interop';
 
 export interface LoginResponse {
@@ -22,11 +22,10 @@ export class AuthService {
   constructor(
     private router: Router,
     private injector: Injector,
-    private configService: ConfigService
   ) {
-   
     this.restoreSession().subscribe(); 
   }  
+
   private get http(): HttpClient {
     return this.injector.get(HttpClient);
   }
@@ -53,7 +52,7 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<HttpResponse<LoginResponse>> {
-    const url = `${this.configService.getApiUrl()}/auth/login`;
+    const url = `${environment.apiUrl}/auth/login`;
 
     return this.http.post<LoginResponse>(url, { email, password }, {
       observe: 'response',
@@ -70,6 +69,7 @@ export class AuthService {
       })
     );
   }
+
   private handleLoginSuccess(email: string, role: string): void {
     const normalizedRole = this.normalizeRole(role);
     this.currentUserSig.set(email);
@@ -79,7 +79,7 @@ export class AuthService {
   }
 
   restoreSession(): Observable<boolean> {
-    const url = `${this.configService.getApiUrl()}/auth/me`;
+    const url = `${environment.apiUrl}/auth/me`;
 
     return this.http.get<LoginResponse>(url, { withCredentials: true }).pipe(
       tap((user) => {
@@ -102,7 +102,7 @@ export class AuthService {
   }
 
   register(username: string, email: string, password: string, telefono: string, rubro: string, role: string): Observable<void> {
-    const url = `${this.configService.getApiUrl()}/auth/register`;
+    const url = `${environment.apiUrl}/auth/register`;
 
     return this.http.post<void>(url, { username, email, password, telefono, rubro, role }, { withCredentials: true }).pipe(
       tap(() => console.log('📝 Usuario registrado exitosamente')),
@@ -114,7 +114,7 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    const url = `${this.configService.getApiUrl()}/auth/logout`;
+    const url = `${environment.apiUrl}/auth/logout`;
 
     return this.http.post<void>(url, {}, { withCredentials: true }).pipe(
       tap(() => {
@@ -131,13 +131,27 @@ export class AuthService {
     );
   }
 
-  resetPassword(token: string, password: string): Observable<void> {
-    const url = `${this.configService.getApiUrl()}/auth/reset-password`;
+  resetPassword(password: string, token: string): Observable<void> {
+    const url = `${environment.apiUrl}/auth/reset-password`;
+    return this.http.post<void>(url, { newPassword: password, token }, { withCredentials: true });
+  }
+  
+  validateResetToken(token: string): Observable<void> {
+    const url = `${environment.apiUrl}/auth/validate-reset-token`;
+    return this.http.post<void>(url, { token }, { withCredentials: true });
+  }
+  
+  
+  
 
-    return this.http.post<void>(url, { token, password }, { withCredentials: true }).pipe(
+  recoverPassword(email: string): Observable<void> {
+    const url = `${environment.apiUrl}/auth/recover-password`;
+
+    return this.http.post<void>(url, { email }, { withCredentials: true }).pipe(
+      tap(() => console.log('📧 Solicitud de recuperación enviada exitosamente')),
       catchError((error: HttpErrorResponse) => {
-        console.error('Error en resetPassword:', error);
-        return throwError(() => new Error('No se pudo restablecer la contraseña'));
+        console.error('Error en recoverPassword:', error);
+        return throwError(() => new Error(this.extractErrorMessage(error)));
       })
     );
   }

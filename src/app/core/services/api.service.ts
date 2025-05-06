@@ -5,7 +5,7 @@ import { VarianteProducto } from '../../shared/models/variante-producto.model';
 
 
 import { v4 as uuidv4 } from 'uuid';
-import { Producto } from '../../shared/models/Producto.model';
+import { Producto } from '../../shared/models/ProductoBase.model';
 import { Cliente } from '../../shared/models/Cliente.model';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';

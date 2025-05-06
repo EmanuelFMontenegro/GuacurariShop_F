@@ -1,49 +1,58 @@
-<!-- <div class="min-h-screen bg-gradient-to-br from-[#1D76D2] to-[#F5F7FB] flex items-center justify-center p-4"> -->
-    <!-- Card con efecto de blur -->
-    <!-- <div class="bg-white/50 backdrop-blur-lg rounded-xl shadow-lg p-8 w-full max-w-md"> -->
-      <!-- Logo y título dentro de la tarjeta -->
-      <!-- <div class="text-center relative">
-        <img class="mx-auto max-h-38 w-auto scale-110 mb-[-8px] pb-4" src="/guacurari_tech.png" alt="GuacurariShop">
-        <h2 class="text-2xl font-bold text-transparent bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] bg-clip-text pb-4">
-          Recuperar contraseña
-        </h2>
-      </div> -->
-      
-      <!-- Formulario de recuperación de contraseña -->
-      <!-- <form class="space-y-6 mt-6" (ngSubmit)="recoverPassword()">
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-900">Correo electrónico</label>
-          <div class="mt-2 flex items-center">
-            <span class="material-symbols-outlined mr-2 bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] text-transparent bg-clip-text">
-              person
-            </span>
-            <input type="email" id="email" [(ngModel)]="email" name="email" autocomplete="email" required 
-                   class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
-                          focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm">
-          </div>
-        </div> -->
-  
-        <!-- <div>
-          <button type="submit" 
-                  class="w-full flex justify-center items-center rounded-md bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] 
-                         shadow-md text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 
-                         active:opacity-[0.85] px-4 py-3 h-11">
-            <span *ngIf="!isLoading">Recuperar contraseña</span>
-            <div *ngIf="isLoading" class="animate-spin w-5 h-5 border-4 border-t-transparent border-white rounded-full"></div>
-          </button>
+<div class="min-h-screen bg-gradient-to-br from-[#1D76D2] to-[#F5F7FB] flex items-center justify-center p-4">
+  <!-- Card con efecto de blur -->
+  <div class="bg-white/50 backdrop-blur-lg rounded-xl shadow-lg p-8 w-full max-w-md">
+    
+    <!-- Logo y título dentro de la tarjeta -->
+    <div class="text-center relative">
+      <img class="mx-auto max-h-28 w-auto scale-110 mb-[-8px] pb-4" src="/guacurari_tech.png" alt="GuacurariShop">
+      <h2 class="text-2xl font-bold text-transparent bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] bg-clip-text pb-4">
+        Recuperar contraseña
+      </h2>
+    </div> 
+
+    <!-- Formulario de recuperación de contraseña -->
+    <form class="space-y-6 mt-6" (ngSubmit)="recoverPassword()">
+      <div>
+        <label for="email" class="block text-sm font-medium text-transparent bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+          Correo electrónico
+        </label>
+        <div class="mt-2 flex items-center">
+          <span class="material-symbols-outlined mr-2 bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] text-transparent bg-clip-text">
+            person
+          </span>
+          <input type="email"
+                 id="email"
+                 [value]="email()"
+                 (input)="email.set($any($event.target).value)"
+                 name="email"
+                 autocomplete="email"
+                 required 
+                 class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+                        focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm">
         </div>
-      </form> -->
-  
-      <!-- Mensaje de login -->
-      <!-- <p class="mt-10 text-center text-sm text-gray-500">
-        ¿Ya tienes tu contraseña? 
-        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Inicia sesión</a>
-      </p> -->
-  
-      <!-- Mensaje de error -->
-      <!-- <div *ngIf="errorMessage" class="text-red-500 text-sm mt-2">
-        {{ errorMessage }}
+
+        <!-- Mensaje de error debajo del input -->
+        <div *ngIf="errorMessage()" class="text-red-500 text-xs mt-1 ml-8">
+          Formato inválido. Debe ser ejemplo&#64;dominio.com
+        </div>
+      </div> 
+
+      <div>
+        <button type="submit" 
+                class="w-full flex justify-center items-center rounded-md bg-gradient-to-tr from-[#9B59B6] to-[#1D76D2] 
+                       shadow-md text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 
+                       active:opacity-[0.85] px-4 py-3 h-11">
+          <span *ngIf="!isLoading()">Recuperar contraseña</span>
+          <div *ngIf="isLoading()" class="animate-spin w-5 h-5 border-4 border-t-transparent border-white rounded-full"></div>
+        </button>
       </div>
-    </div>
-  </div> -->
-  
+    </form> 
+
+    <!-- Mensaje de login -->
+    <p class="mt-10 text-center text-sm text-gray-500">
+      ¿Ya tienes tu contraseña? 
+      <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Inicia sesión</a>
+    </p>  
+
+  </div>
+</div>

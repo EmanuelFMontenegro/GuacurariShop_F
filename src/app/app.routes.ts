@@ -10,11 +10,11 @@ export const routes: Routes = [
         path: 'login',
         loadComponent: () => import('./features/auth/login/login.component')
           .then(m => m.LoginComponent)
-      },
+      },      
       {
-        path: 'resetear-contrasena',
-        loadComponent: () => import('./features/auth/resetear-contrasena/resetear-contrasena.component')
-          .then(m => m.ResetearContrasenaComponent)
+        path: 'registro',
+        loadComponent: () => import('./features/auth/registro/registro.component')
+          .then(m => m.RegistroComponent)
       },
       {
         path: 'recuperar-contrasena',
@@ -22,10 +22,10 @@ export const routes: Routes = [
           .then(m => m.RecuperarContrasenaComponent)
       },
       {
-        path: 'registro',
-        loadComponent: () => import('./features/auth/registro/registro.component')
-          .then(m => m.RegistroComponent)
-      }
+        path: 'resetear-contrasena',
+        loadComponent: () => import('./features/auth/resetear-contrasena/resetear-contrasena.component')
+          .then(m => m.ResetearContrasenaComponent)
+      }      
     ]
   },
 
@@ -46,18 +46,18 @@ export const routes: Routes = [
           .then(m => m.DashboardComponent),
         canActivate: [AuthGuard]
       },
-      {
-        path: 'ventas',
-        loadComponent: () => import('./features/ventas/ventas.component')
-          .then(m => m.VentasComponent),
-        canActivate: [AuthGuard]
-      },
-      {
-        path: 'productos',
-        loadComponent: () => import('./features/productos/productos.component')
-          .then(m => m.ProductosComponent),
-        canActivate: [AuthGuard]
-      },
+      // {
+      //   path: 'ventas',
+      //   loadComponent: () => import('./features/ventas/presentation/ventas.component')
+      //     .then(m => m.VentasComponent),
+      //   canActivate: [AuthGuard]
+      // },
+      // {
+      //   path: 'productos',
+      //   loadComponent: () => import('./features/productos/productos.component')
+      //     .then(m => m.ProductosComponent),
+      //   canActivate: [AuthGuard]
+      // },
       // {
       //   path: 'compras',
       //   loadComponent: () => import('./features/compras/compras.component')

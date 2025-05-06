@@ -1,5 +1,5 @@
 
-import { Producto } from "./Producto.model"; 
+import { Producto } from "./ProductoBase.model"; 
 
 export interface Factura {
   id: string;

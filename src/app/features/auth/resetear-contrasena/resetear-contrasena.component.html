@@ -1,58 +1,79 @@
 <div class="min-h-screen bg-gradient-to-br from-[#1D76D2] to-[#F5F7FB] flex items-center justify-center p-4">
-    <!-- Card con efecto de blur -->
-    <div class="bg-white/50 backdrop-blur-lg rounded-xl shadow-lg p-8 w-full max-w-md">
-      <!-- Logo y título dentro de la tarjeta -->
-      <div class="text-center relative">
-        <img class="mx-auto max-h-28 w-auto scale-110 mb-[-8px] pb-4" src="/guacurari_tech.png" alt="GuacurariShop">
-        <h2 class="text-2xl font-bold text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text pb-4">
-          Restablecer Contraseña
-        </h2>
-      </div>
-      
-      <form class="space-y-6 mt-6" [formGroup]="resetForm" (ngSubmit)="resetPassword()">
-        <!-- Campo Nueva Contraseña -->
-        <div>
-          <label for="newPassword" class="block text-sm font-medium text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
-            Nueva Contraseña
-          </label>
-          <div class="mt-2 flex items-center relative">
-            <span class="material-symbols-outlined mr-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
-              lock
-            </span>
-            <input 
-              [type]="passwordVisible() ? 'text' : 'password'" 
-              id="newPassword" 
-              formControlName="password"  
-              class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
-                     focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm pr-10"
-              autocomplete="new-password"
-            >
-            <span 
-              (click)="togglePasswordVisibility()" 
-              class="material-symbols-outlined cursor-pointer absolute right-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text"
-            >
-              {{ passwordVisible() ? 'visibility' : 'visibility_off' }}
-            </span>
-          </div>
-        </div>
-        
-        <!-- Botón de Submit -->
-        <div>
-          <button 
-            type="submit" 
-            [disabled]="resetForm.invalid || isLoading()"
-            class="w-full flex justify-center items-center rounded-md bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] 
-                   shadow-md text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 
-                   active:opacity-[0.85] px-4 py-3 h-11"
-          >
-            <div *ngIf="isLoading()"> 
-              <div class="animate-spin w-5 h-5 border-4 border-t-transparent border-white rounded-full"></div>
-            </div>
-            <span *ngIf="!isLoading()">Restablecer Contraseña</span>
-          </button>
-        </div>
-      </form>
-      
+  <!-- Card con efecto de blur -->
+  <div class="bg-white/50 backdrop-blur-lg rounded-xl shadow-lg p-8 w-full max-w-md">
+    <!-- Logo y título dentro de la tarjeta -->
+    <div class="text-center relative">
+      <img class="mx-auto max-h-28 w-auto scale-110 mb-[-8px] pb-4" src="/guacurari_tech.png" alt="GuacurariShop">
+      <h2 class="text-2xl font-bold text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text pb-4">
+        Restablecer Contraseña
+      </h2>
     </div>
+
+    <form class="space-y-6 mt-6" [formGroup]="resetForm" (ngSubmit)="resetPassword()">
+      <!-- Campo Nueva Contraseña -->
+      <div>
+        <label for="newPassword" class="block text-sm font-medium text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+          Nueva Contraseña
+        </label>
+        <div class="mt-2 flex items-center relative">
+          <span class="material-symbols-outlined mr-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+            lock
+          </span>
+          <input 
+          [type]="passwordVisible() ? 'text' : 'password'"
+            id="newPassword" 
+            formControlName="password"  
+            class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+                   focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm pr-10"
+            autocomplete="new-password"
+          >
+        </div>
+      </div>
+
+      <!-- Campo Confirmar Contraseña -->
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+          Confirmar Contraseña
+        </label>
+        <div class="mt-2 flex items-center relative">
+          <span class="material-symbols-outlined mr-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text">
+            lock
+          </span>
+          <input 
+          [type]="passwordVisible() ? 'text' : 'password'" 
+            id="confirmPassword" 
+            formControlName="confirmPassword"  
+            class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+                   focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm pr-10"
+            autocomplete="new-password"
+          >
+          <span 
+            (click)="togglePasswordVisibility()" 
+            class="material-symbols-outlined cursor-pointer absolute right-2 text-transparent bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] bg-clip-text"
+          >
+          {{ passwordVisible() ? 'visibility' : 'visibility_off' }}
+          </span>
+        </div>
+        <div *ngIf="resetForm.hasError('mismatch') && resetForm.get('confirmPassword')?.touched" class="text-sm text-red-600 mt-1">
+          Las contraseñas no coinciden.
+        </div>
+      </div>
+
+      <!-- Botón de Submit -->
+      <div>
+        <button 
+          type="submit" 
+          [disabled]="resetForm.invalid || isLoading()"
+          class="w-full flex justify-center items-center rounded-md bg-gradient-to-r from-[#9B59B6] to-[#1D76D2] 
+                 shadow-md text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 
+                 active:opacity-[0.85] px-4 py-3 h-11"
+        >
+          <div *ngIf="isLoading()"> 
+            <div class="animate-spin w-5 h-5 border-4 border-t-transparent border-white rounded-full"></div>
+          </div>
+          <span *ngIf="!isLoading()">Restablecer Contraseña</span>
+        </button>
+      </div>
+    </form>
   </div>
-  
+</div>

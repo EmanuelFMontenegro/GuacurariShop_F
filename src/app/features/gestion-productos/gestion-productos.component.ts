@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
-import { Producto } from '../../shared/models/Producto.model';
+import { Producto } from '../../shared/models/ProductoBase.model';
 import CategoryService
 import { Category } from '../../shared/models/Category.model';
 import { ApiService } from '../../core/services/api.service';

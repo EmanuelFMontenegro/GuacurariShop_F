@@ -22,15 +22,15 @@
     
     <div>
       <label for="product-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Producto Seleccionado
+        Nombre del producto
       </label>
       <input
         type="text"
         id="product-name"
-        class="w-full p-3 mt-1 rounded-md border border-gray-300 bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+        class="w-full p-3 mt-1 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
         placeholder="Nombre del producto"
-        [(ngModel)]="selectedProduct"
-        readonly
+        [(ngModel)]="nombreProducto"
+        (input)="buscarProductoPorNombre(nombreProducto)"
       />
     </div>
   </div>
@@ -58,7 +58,7 @@
               (change)="actualizarSubtotal(item)"
             />
           </td>
-          <td class="px-4 py-2 text-right">${{ item.precio | number: '1.2-2' }}</td>
+          <td class="px-4 py-2 text-right">{{ item.precioVenta | number: '1.2-2' }}</td>
           <td class="px-4 py-2 text-right">
             ${{ actualizarSubtotal(item) | number: '1.2-2' }}
           </td>

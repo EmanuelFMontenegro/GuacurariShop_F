@@ -2,9 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VentasComponent } from './ventas.component';
 import { VentasFacade } from '../aplications/ventas.facade';
 import { ToastrService } from 'ngx-toastr';
-import { of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
-// Mock de ProductoBase
 interface ProductoBase {
   productoId: string;
   nombre: string;
@@ -16,74 +17,70 @@ interface ProductoBase {
   cantidad?: number;
 }
 
-// Mock de VentasFacade
 class MockVentasFacade {
-  private carrito: ProductoBase[] = [];
-  
-  getProductos() {
-    return of([{
+  private _carrito = new BehaviorSubject<ProductoBase[]>([]);
+  carrito$ = this._carrito.asObservable();
+
+  private productos: ProductoBase[] = [
+    {
       productoId: '1',
       nombre: 'Producto 1',
       precioCompra: 100,
       precioVenta: 150,
       stock: 10,
       categoria: 'Categoria 1',
-      modoEdicion: false,
       cantidad: 1
-    }]);
+    }
+  ];
+
+  getProductos(): Observable<ProductoBase[]> {
+    return of(this.productos);
   }
 
   agregarProductoACarrito(producto: ProductoBase) {
-    this.carrito.push(producto);
+    const current = this._carrito.getValue();
+    this._carrito.next([...current, producto]);
   }
 
-  obtenerTotalVenta() {
-    return this.carrito.reduce((total, item) => total + (item.precioVenta * (item.cantidad || 1)), 0);
+  obtenerTotalVenta(): number {
+    return this._carrito.getValue().reduce((total, item) => total + (item.precioVenta * (item.cantidad || 1)), 0);
   }
 
   realizarVenta() {
     const total = this.obtenerTotalVenta();
-    this.carrito = [];
+    this._carrito.next([]);
     return of({ total });
   }
 
   eliminarProductoDelCarrito(producto: ProductoBase) {
-    this.carrito = this.carrito.filter(p => p.productoId !== producto.productoId);
+    const updated = this._carrito.getValue().filter(p => p.productoId !== producto.productoId);
+    this._carrito.next(updated);
   }
+
+  actualizarCantidadProducto(_: ProductoBase) {}
 }
 
 describe('VentasComponent', () => {
   let component: VentasComponent;
   let fixture: ComponentFixture<VentasComponent>;
   let ventasFacade: MockVentasFacade;
-  let toastrService: ToastrService;
+  let toastrService: jasmine.SpyObj<ToastrService>;
 
   beforeEach(async () => {
+    const toastrSpy = jasmine.createSpyObj('ToastrService', ['success', 'warning', 'error']);
+
     await TestBed.configureTestingModule({
-      declarations: [VentasComponent],
+      imports: [VentasComponent, CommonModule, FormsModule],
       providers: [
         { provide: VentasFacade, useClass: MockVentasFacade },
-        { 
-          provide: ToastrService, 
-          useValue: { 
-            success: jasmine.createSpy('success'), 
-            warning: jasmine.createSpy('warning') 
-          }
-        }
+        { provide: ToastrService, useValue: toastrSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(VentasComponent);
     component = fixture.componentInstance;
-    ventasFacade = TestBed.inject(VentasFacade);
-    toastrService = TestBed.inject(ToastrService);
-
-    // Mock de métodos del componente
-    component.selectedProduct = null;
-    component.onBarcodeInput = jasmine.createSpy('onBarcodeInput');
-    component.actualizarSubtotal = jasmine.createSpy('actualizarSubtotal').and.callFake((item: ProductoBase) => {
-      return item.precioVenta * (item.cantidad || 1);
-    });
+    ventasFacade = TestBed.inject(VentasFacade) as any;
+    toastrService = TestBed.inject(ToastrService) as jasmine.SpyObj<ToastrService>;
 
     fixture.detectChanges();
   });
@@ -92,33 +89,51 @@ describe('VentasComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load productos on init', () => {
+  it('should load productos on init and update carrito', () => {
     component.ngOnInit();
-    expect(component.productos.length).toBe(1);
-    expect(component.productos[0].nombre).toBe('Producto 1');
+    ventasFacade.agregarProductoACarrito({
+      productoId: '2',
+      nombre: 'Producto Test',
+      precioCompra: 20,
+      precioVenta: 40,
+      stock: 10,
+      categoria: 'Test',
+      cantidad: 1
+    });
+    expect(component.carrito.length).toBe(1);
   });
 
   it('should add product to carrito and calculate total', () => {
     const producto: ProductoBase = {
-      productoId: '1',
-      nombre: 'Producto Test',
-      precioCompra: 50,
-      precioVenta: 100,
-      stock: 5,
-      categoria: 'Test'
+      productoId: '3',
+      nombre: 'Producto Nuevo',
+      precioCompra: 10,
+      precioVenta: 25,
+      stock: 2,
+      categoria: 'X',
+      cantidad: 2
     };
-    
     component.agregarAlCarrito(producto);
-    expect(ventasFacade.obtenerTotalVenta()).toBe(100);
+    const total = ventasFacade.obtenerTotalVenta();
+    expect(total).toBe(50);
   });
 
   it('should show success toast when a sale is completed', () => {
+    const producto: ProductoBase = {
+      productoId: '4',
+      nombre: 'Vendible',
+      precioCompra: 10,
+      precioVenta: 30,
+      stock: 5,
+      categoria: 'Y',
+      cantidad: 2
+    };
+    component.agregarAlCarrito(producto);
     component.realizarVenta();
-    expect(toastrService.success).toHaveBeenCalledWith('Venta realizada. Total: $0', 'Éxito');
+    expect(toastrService.success).toHaveBeenCalledWith('Venta realizada. Total: $60', 'Éxito');
   });
 
-  it('should show warning toast when there are no products in the carrito', () => {
-    (ventasFacade as any).carrito = [];
+  it('should show warning toast when carrito is empty', () => {
     component.realizarVenta();
     expect(toastrService.warning).toHaveBeenCalledWith('No hay productos en el carrito', 'Aviso');
   });

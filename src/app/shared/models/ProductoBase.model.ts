@@ -4,6 +4,8 @@ export interface ProductoBase {
   productoId: string;
   nombre: string;
   precioCompra: number;
+  precio: number;
+  codigoBarras: string;
   precioVenta: number;
   stock: number;
   categoria: string;

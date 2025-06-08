@@ -75,31 +75,32 @@ export class AuthService {
     this.currentUserSig.set(email);
     this.userRolesSig.set([normalizedRole]);
     this.isAuthenticatedSig.set(true);
+    this.navigateToDashboard();
+  }
+  
+  private navigateToDashboard(): void {
     this.router.navigate(['/dashboard']);
   }
-
+  
   restoreSession(): Observable<boolean> {
     const url = `${environment.apiUrl}/auth/me`;
-
+  
     return this.http.get<LoginResponse>(url, { withCredentials: true }).pipe(
       tap((user) => {
-        if (user) {
-          this.currentUserSig.set(user.email);
-          this.userRolesSig.set([this.normalizeRole(user.role)]);
-          this.isAuthenticatedSig.set(true);
-          console.log('🔁 Sesión Activa !!!');
-        }
+        this.currentUserSig.set(user.email);
+        this.userRolesSig.set([this.normalizeRole(user.role)]);
+        this.isAuthenticatedSig.set(true);
       }),
-      map(() => true),
-      catchError((err: HttpErrorResponse) => {
-        console.log('🔒 No se restauró sesión (no es grave):', err);
-        this.currentUserSig.set(null);
-        this.userRolesSig.set([]);
-        this.isAuthenticatedSig.set(false);
+      map(() => true), 
+      catchError(() => {
+        this.clearAuthState();
         return of(false);
       })
     );
   }
+  
+  
+  
 
   register(username: string, email: string, password: string, telefono: string, rubro: string, role: string): Observable<void> {
     const url = `${environment.apiUrl}/auth/register`;
@@ -155,10 +156,18 @@ export class AuthService {
       })
     );
   }
-
+  
+  clearAuthState(): void {
+    this.currentUserSig.set(null);
+    this.userRolesSig.set([]);
+    this.isAuthenticatedSig.set(false);
+    this.hasAuthorizationCodeSig.set(false); 
+  }
+  
   public extractErrorMessage(error: HttpErrorResponse): string {
     if (error.status === 0) return 'No se pudo conectar con el servidor.';
-    if (error.status >= 500) return 'Error del servidor.';
+    if (error.status === 400) return 'Solicitud incorrecta, por favor verifique los datos.';
+    if (error.status === 500) return 'Error del servidor, por favor intente más tarde.';
     if (error.status === 401 || error.status === 403) return 'Credenciales incorrectas.';
     return error.error?.message || error.message || 'Error inesperado.';
   }
